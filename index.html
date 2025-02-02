@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AOCB</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .drumroll-container {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            overflow: hidden;
+            margin: auto;
+            border: 2px solid #333;
+        }
+        .drumroll {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.5s ease;
+            user-select: none;
+        }
+        .character {
+            width: 100%;
+            padding: 10px;
+            background: #f0f0f0;
+            border-bottom: 1px solid #ccc;
+            opacity: 0.5;
+        }
+        .highlight {
+            background: #ffeb3b;
+            opacity: 1;
+            font-weight: bold;
+        }
+        .character a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>All OC Birthday</h1>
+    <div class="drumroll-container" id="drumrollContainer">
+        <div id="drumroll" class="drumroll">
+            <!-- キャラクター情報をここに追加 -->
+        </div>
+    </div>
+    <button onclick="rotateUp()">↑</button>
+    <button onclick="rotateDown()">↓</button>
+    <button onclick="resetDrumroll()">リセット</button>
+    
+    <script>
+        const characters = [
+            
+            { name: "山上 蘭希",     birthday: "--", link: "https://iachara.com/view/6155840" },
+            { name: "mellow",       birthday: "--", link: "https://iachara.com/view/6980746" },
+            { name: "箕眞　句々類",  birthday: "--", link: "https://emoklore.charasheet.jp/view/324291" },
+            { name: "Noah",         birthday: "02-01", link: "https://iachara.com/view/6051172" },
+            { name: "試作の人",      birthday: "02-02", link: "#" },
+            { name: "Sextilis",     birthday: "02-10", link: "https://iachara.com/view/9541399" },
+            { name: "廻詩達　糾",    birthday: "03-10", link: "https://iachara.com/view/5769316" },
+            { name: "枸累　藍",      birthday: "03-24", link: "https://iachara.com/view/6563593" },
+            { name: "花韮　想沙",    birthday: "03-30", link: "https://iachara.com/view/5612818" },
+            { name: "宇都　キソ",    birthday: "04-25", link: "https://iachara.com/view/6926721" },
+            { name: "∷ 宵華",       birthday: "05-01", link: "https://iachara.com/view/6924663" },
+            { name: "早乙女　語",    birthday: "05-08", link: "https://iachara.com/view/5924757" },
+            { name: "附子",         birthday: "05-25", link: "https://iachara.com/view/6333334" },
+            { name: "奈良　心",     birthday: "06-22", link: "https://iachara.com/view/5512258" },
+            { name: "黒井　飴",     birthday: "06-24", link: "https://iachara.com/view/6493497" },
+            { name: "阿多田　夕立",  birthday: "07-13", link: "https://iachara.com/view/5326663" },
+            { name: "john",         birthday: "07-19", link: "https://iachara.com/view/8285787" },
+            { name: "汐見　美津",    birthday: "07-20", link: "https://iachara.com/view/6869721" },
+            { name: "玖波　小豆",    birthday: "08-24", link: "https://iachara.com/view/6869656" },
+            { name: "芒星クロネ",    birthday: "10-20", link: "https://iachara.com/view/5588137" },
+            { name: "月村彼方",      birthday: "11-08", link: "https://iachara.com/view/6788313" },
+            { name: "西麻植　蛙",    birthday: "11-16", link: "https://iachara.com/view/7733558" },
+            { name: "月村　優",      birthday: "12-02", link: "https://iachara.com/view/9842451" },
+            { name: "幸村　優",      birthday: "12-02", link: "https://iachara.com/view/5519284" }
+        ];
+        
+        function renderDrumroll() {
+            const drumroll = document.getElementById("drumroll");
+            drumroll.innerHTML = characters.map(c => {
+                const today = new Date().toISOString().slice(5, 10);
+                const isToday = c.birthday === today;
+                return `
+                    <div class="character ${isToday ? 'highlight' : ''}">
+                        <a href="${c.link}" target="_blank">${c.name}</a> : ${c.birthday}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function rotateUp() {
+            const drumroll = document.getElementById("drumroll");
+            drumroll.insertBefore(drumroll.lastElementChild, drumroll.firstElementChild);
+        }
+        
+        function rotateDown() {
+            const drumroll = document.getElementById("drumroll");
+            drumroll.appendChild(drumroll.firstElementChild);
+        }
+        
+        function resetDrumroll() {
+            renderDrumroll();
+            const today = new Date().toISOString().slice(5, 10);
+            let targetIndex = characters.findIndex(c => c.birthday >= today);
+            if (targetIndex === -1) targetIndex = 0;
+            
+            const drumroll = document.getElementById("drumroll");
+            drumroll.style.transform = `translateY(-${(targetIndex - 1.5) * 40}px)`;
+        }
+        
+        let startY;
+        let isDragging = false;
+        
+        document.getElementById("drumrollContainer").addEventListener("wheel", (event) => {
+            event.preventDefault();
+            event.deltaY > 0 ? rotateDown() : rotateUp();
+
+        });
+        
+        document.getElementById("drumrollContainer").addEventListener("mousedown", (event) => {
+            startY = event.clientY;
+            isDragging = true;
+        });
+        
+        document.addEventListener("mouseup", () => {
+            isDragging = false;
+        });
+        
+        document.addEventListener("mousemove", (event) => {
+            if (isDragging) {
+                if (event.clientY > startY + 10) {
+                    rotateDown();
+                    startY = event.clientY;
+                } else if (event.clientY < startY - 10) {
+                    rotateUp();
+                    startY = event.clientY;
+                }
+            }
+        });
+        
+        renderDrumroll();
+    </script>
+</body>
+</html>
